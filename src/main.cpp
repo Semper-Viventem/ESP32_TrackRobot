@@ -10,12 +10,8 @@ void checkPWM(int pwm) {
 }
 
 void rotate(uint8_t pwm, uint8_t channel, uint8_t dirPin, bool isReverse) {
-  if (isReverse) {
-    digitalWrite(dirPin, HIGH);
-  } else {
-    digitalWrite(dirPin, LOW);
-  }
-
+  digitalWrite(dirPin, isReverse);
+  
   uint8_t pwmValue = pwm;
   if (isReverse) {
     pwmValue = MAX_PWM - pwm;
