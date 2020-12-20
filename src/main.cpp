@@ -1,99 +1,35 @@
-#include <Arduino.h> // yes, i'm using arduino fucking framework for ESP32.
-#include <WiFi.h>
-#include <ESPAsyncWebServer.h>
+#include <main.h>
 
-const char* wifiSSID = "Napoleon Free";
-const char* wifiPassword = "NapoleoN";
-AsyncWebServer server(80);
+AsyncWebServer server(SERVER_PORT);
 AsyncWebSocket ws("/");
 
-int PIN_B_PWM = 12;
-int PIN_B_DIR = 13;
-int PIN_A_PWM = 27;
-int PIN_A_DIR = 14;
-
-int freq = 500;
-int channelB = 0;
-int channelA = 1;
-int resolution = 8;
-
-int minSpeed = 0;
-int maxSpeed = 255;
-
-const char* LEFT = "l";
-const char* RIGHT = "r";
-
 void checkPWM(int pwm) {
-  if (pwm < minSpeed || pwm > maxSpeed) {
+  if (pwm < MIN_PWM || pwm > MAX_PWM) {
     Serial.println("Unsupported PWM: " + pwm);
   }
 }
 
-void rotate(int pwm, int channel, int dirPin, bool isReverse) {
-  checkPWM(pwm);
-
+void rotate(uint8_t pwm, uint8_t channel, uint8_t dirPin, bool isReverse) {
+  digitalWrite(dirPin, isReverse);
+  
+  uint8_t pwmValue = pwm;
   if (isReverse) {
-    digitalWrite(dirPin, HIGH);
-  } else {
-    digitalWrite(dirPin, LOW);
-  }
-
-  int pwmValue = pwm;
-  if (isReverse) {
-    pwmValue = maxSpeed - pwm;
+    pwmValue = MAX_PWM - pwm;
   }
   ledcWrite(channel, pwmValue);
 }
 
-void rotateLeft(int speed, bool isReverse) {
-  rotate(speed, channelB, PIN_B_DIR, isReverse);
+void rotateLeft(uint8_t speed, bool isReverse) {
+  rotate(speed, CHANNEL_B, PIN_B_DIR, isReverse);
 }
 
-void rotateRight(int speed, bool isReverse) {
-  rotate(speed, channelA, PIN_A_DIR, isReverse);
+void rotateRight(uint8_t speed, bool isReverse) {
+  rotate(speed, CHANNEL_A, PIN_A_DIR, isReverse);
 }
 
 void stop() {
-  rotateLeft(0, false);
-  rotateRight(0, false);
-}
-
-void initPins() {
-  Serial.println("Initializing pins...");
-  pinMode(PIN_A_DIR, OUTPUT);
-  pinMode(PIN_A_PWM, OUTPUT);
-  digitalWrite(PIN_A_DIR, LOW);
-  digitalWrite(PIN_A_PWM, LOW);
-  
-  pinMode(PIN_B_DIR, OUTPUT);
-  pinMode(PIN_B_PWM, OUTPUT);
-  digitalWrite(PIN_B_DIR, LOW);
-  digitalWrite(PIN_B_PWM, LOW);
-
-  ledcSetup(channelA, freq, resolution);
-  ledcSetup(channelB, freq, resolution);
-
-  ledcAttachPin(PIN_A_PWM, channelA);
-  ledcAttachPin(PIN_B_PWM, channelB);
-}
-
-void initWiFi() {
-
-    // We start by connecting to a WiFi network
-    Serial.print("Connecting to ");
-    Serial.println(wifiSSID);
-
-    WiFi.begin(wifiSSID, wifiPassword);
-
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-    }
-
-    Serial.println("");
-    Serial.println("WiFi connected.");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
+  rotateLeft(MIN_PWM, false);
+  rotateRight(MIN_PWM, false);
 }
 
 void handleMessage(String message) {
@@ -107,6 +43,8 @@ void handleMessage(String message) {
   if (isReverse) {
     value = abs(value);
   }
+
+  checkPWM(value);
 
   String firstSymbol = message.substring(0, 1);
   Serial.println(firstSymbol);
@@ -134,7 +72,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
 }
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(SERIAL_SPEED);
   
   initPins();
   initWiFi();
@@ -145,4 +83,41 @@ void setup() {
   server.begin();
 }
 
-void loop() {}
+void loop() { }
+
+void initPins() {
+  Serial.println("Initializing pins...");
+  pinMode(PIN_A_DIR, OUTPUT);
+  pinMode(PIN_A_PWM, OUTPUT);
+  digitalWrite(PIN_A_DIR, LOW);
+  digitalWrite(PIN_A_PWM, LOW);
+  
+  pinMode(PIN_B_DIR, OUTPUT);
+  pinMode(PIN_B_PWM, OUTPUT);
+  digitalWrite(PIN_B_DIR, LOW);
+  digitalWrite(PIN_B_PWM, LOW);
+
+  ledcSetup(CHANNEL_A, PWM_FREQ, PWM_RESOLUTION);
+  ledcSetup(CHANNEL_B, PWM_FREQ, PWM_RESOLUTION);
+
+  ledcAttachPin(PIN_A_PWM, CHANNEL_A);
+  ledcAttachPin(PIN_B_PWM, CHANNEL_B);
+}
+
+void initWiFi() {
+    // We start by connecting to a WiFi network
+    Serial.print("Connecting to ");
+    Serial.println(wifiSSID);
+
+    WiFi.begin(wifiSSID, wifiPassword);
+
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+    }
+
+    Serial.println("");
+    Serial.println("WiFi connected.");
+    Serial.println("IP address: ");
+    Serial.println(WiFi.localIP());
+}
