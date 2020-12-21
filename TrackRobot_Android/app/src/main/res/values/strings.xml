@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">TrackRobot_Android</string>
+    <string name="robot_ip">Robot IP</string>
+</resources>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/ipAddressInput"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/normal_gap"
+        android:layout_marginTop="@dimen/normal_gap"
+        android:layout_marginEnd="@dimen/normal_gap"
+        android:hint="@string/robot_ip"
+        android:digits="0123456789."
+        android:inputType="numberDecimal|number"
+        app:layout_constraintEnd_toStartOf="@id/connectButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/connectButton"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginEnd="@dimen/normal_gap"
+        android:background="?attr/selectableItemBackground"
+        android:paddingStart="@dimen/normal_gap"
+        android:paddingEnd="@dimen/normal_gap"
+        android:src="@drawable/ic_baseline_done_24"
+        android:tint="@color/purple_500"
+        app:layout_constraintBottom_toBottomOf="@id/ipAddressInput"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/ipAddressInput"
+        app:layout_constraintTop_toTopOf="@id/ipAddressInput" />
+
+    <ProgressBar
+        android:id="@+id/connectionProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:progressTint="@color/purple_500"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/connectButton"
+        app:layout_constraintEnd_toEndOf="@id/connectButton"
+        app:layout_constraintStart_toStartOf="@id/connectButton"
+        app:layout_constraintTop_toTopOf="@id/connectButton"
+        tools:visibility="visible" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/centralButton"
+        android:layout_width="@dimen/button_size"
+        android:layout_height="@dimen/button_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ipAddressInput" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/topButton"
+        android:layout_width="@dimen/button_size"
+        android:layout_height="@dimen/button_size"
+        app:layout_constraintBottom_toTopOf="@id/centralButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/bottomButton"
+        android:layout_width="@dimen/button_size"
+        android:layout_height="@dimen/button_size"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/centralButton" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/rightButton"
+        android:layout_width="@dimen/button_size"
+        android:layout_height="@dimen/button_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/centralButton"
+        app:layout_constraintTop_toBottomOf="@id/ipAddressInput" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/leftButton"
+        android:layout_width="@dimen/button_size"
+        android:layout_height="@dimen/button_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/centralButton"
+        app:layout_constraintTop_toBottomOf="@id/ipAddressInput" />
+</androidx.constraintlayout.widget.ConstraintLayout>
