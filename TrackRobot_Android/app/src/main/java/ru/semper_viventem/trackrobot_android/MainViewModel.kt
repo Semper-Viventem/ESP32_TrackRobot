@@ -13,7 +13,7 @@ class MainViewModel(
 ) : ViewModel() {
 
     private val disposable = CompositeDisposable()
-    private var textIsChanging: Boolean = false
+    private var textIsChanging: Boolean = true
     val uiState = MutableLiveData(UiState())
     val sideEffects = SingleLiveEvent<UiSideEffects>()
 
@@ -59,12 +59,12 @@ class MainViewModel(
             .subscribeTillCleared(
                 doOnError = {
                     Timber.e(it)
-                    updateUiState { copy(isConnected = false) }
+                    updateUiState { copy(isConnected = false, buttonsEnabled = false) }
                     emmitSideEffect(UiSideEffects.ToastMessage("Connection error"))
 
                 },
                 doOnSuccess = {
-                    updateUiState { copy(isConnected = true) }
+                    updateUiState { copy(isConnected = true, buttonsEnabled = true) }
                     emmitSideEffect(UiSideEffects.ToastMessage("Connected"))
                 }
             )
@@ -75,6 +75,7 @@ class MainViewModel(
             updateUiState {
                 copy(ipAddress = text, isConnectButtonEnabled = StringValidator.isValidIp(text))
             }
+            textIsChanging = true
         } else {
             textIsChanging = false
         }
@@ -105,10 +106,10 @@ class MainViewModel(
 }
 
 data class UiState(
-    val ipAddress: String = "",
+    val ipAddress: String = "192.168.88.55",
     val buttonsEnabled: Boolean = false,
     val isLoading: Boolean = false,
-    val isConnectButtonEnabled: Boolean = false,
+    val isConnectButtonEnabled: Boolean = true,
     val isConnected: Boolean = false
 )
 

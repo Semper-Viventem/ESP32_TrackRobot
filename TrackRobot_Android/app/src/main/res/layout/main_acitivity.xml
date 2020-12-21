@@ -13,6 +13,8 @@
         android:layout_marginTop="@dimen/normal_gap"
         android:layout_marginEnd="@dimen/normal_gap"
         android:hint="@string/robot_ip"
+        android:digits="0123456789."
+        android:inputType="numberDecimal|number"
         app:layout_constraintEnd_toStartOf="@id/connectButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

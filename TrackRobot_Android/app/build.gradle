@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "ru.semper_viventem.trackrobot_android"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -35,10 +35,6 @@ android {
     }
 }
 
-ext {
-    retrofit_version = '2.7.0'
-}
-
 dependencies {
 
     // kotlin
@@ -57,13 +53,7 @@ dependencies {
     implementation 'com.jakewharton.rxrelay2:rxrelay:2.1.1'
     implementation 'com.jakewharton.rxbinding2:rxbinding-kotlin:2.2.0'
 
-    // Retrofit
-    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
-    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
-    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
-
-    // Gson
-    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.0'
 
     // Logging
     implementation "com.jakewharton.timber:timber:4.7.1"
