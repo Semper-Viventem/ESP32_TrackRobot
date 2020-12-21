@@ -39,11 +39,11 @@ class TrackRobotImpl : TrackRobot {
     }
 
     override fun moveRight(): Completable {
-        return rotate(MIN, MAX)
+        return rotate(MAX, MIN)
     }
 
     override fun moveLeft(): Completable {
-        return rotate(MAX, MIN)
+        return rotate(MIN, MAX)
     }
 
     override fun stop(): Completable {
