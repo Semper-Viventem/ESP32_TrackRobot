@@ -33,8 +33,6 @@ void stop() {
 }
 
 void handleMessage(String message) {
-  Serial.println(message);
-
   message.toLowerCase();
 
   int value = message.substring(2, message.length() - 1).toInt();
@@ -47,10 +45,17 @@ void handleMessage(String message) {
   checkPWM(value);
 
   String firstSymbol = message.substring(0, 1);
-  Serial.println(firstSymbol);
+
+  Serial.print(firstSymbol);
+  Serial.print(" -> ");
+  Serial.println(value);
+
   if (firstSymbol == LEFT) {
     rotateLeft(value, isReverse);
   } else if (firstSymbol == RIGHT) {
+    rotateRight(value, isReverse);
+  } else if (firstSymbol == BOUTH) {
+    rotateeft(value, isReverse);
     rotateRight(value, isReverse);
   }
 }

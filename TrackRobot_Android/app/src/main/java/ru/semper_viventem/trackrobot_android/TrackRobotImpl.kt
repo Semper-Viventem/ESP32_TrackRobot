@@ -2,6 +2,8 @@ package ru.semper_viventem.trackrobot_android
 
 import androidx.annotation.IntRange
 import io.reactivex.Completable
+import io.reactivex.Observable
+import io.reactivex.subjects.BehaviorSubject
 import okhttp3.*
 import okio.ByteString
 import timber.log.Timber
@@ -10,12 +12,21 @@ import java.util.concurrent.TimeUnit
 class TrackRobotImpl : TrackRobot {
 
     private var webSocket: WebSocket? = null
+    private var isConnected = BehaviorSubject.createDefault(false)
 
     override fun connect(ip: String): Completable {
         return if (webSocket != null) {
             Completable.complete()
         } else {
             openNewWebSocket(ip)
+        }
+    }
+
+    override fun observeConnected(): Observable<Boolean> = isConnected.hide()
+
+    override fun disconnect(): Completable {
+        return Completable.fromAction {
+            webSocket?.cancel()
         }
     }
 
@@ -45,14 +56,19 @@ class TrackRobotImpl : TrackRobot {
     ): Completable {
         return webSocket?.let {
             Completable.fromAction {
-                it.send(rotateLeft(left))
-                it.send(rotateRight(right))
+                if (left == right) {
+                    it.send(rotateBoth(left))
+                } else {
+                    it.send(rotateLeft(left))
+                    it.send(rotateRight(right))
+                }
             }
         } ?: Completable.error(IllegalStateException("WebSocket is closed"))
     }
 
-    private fun rotateLeft(@IntRange(from = MIN_L, to = MAX_L) value: Int) = "L $value"
-    private fun rotateRight(@IntRange(from = MIN_L, to = MAX_L) value: Int) = "R $value"
+    private fun rotateLeft(@IntRange(from = MIN_L, to = MAX_L) value: Int) = "L $value\n"
+    private fun rotateRight(@IntRange(from = MIN_L, to = MAX_L) value: Int) = "R $value\n"
+    private fun rotateBoth(@IntRange(from = MIN_L, to = MAX_L) value: Int) = "B $value\n"
 
     private fun openNewWebSocket(ip: String): Completable = Completable.create { emitter ->
         val request = Request.Builder()
@@ -68,15 +84,18 @@ class TrackRobotImpl : TrackRobot {
             object : WebSocketListener() {
                 override fun onOpen(webSocket: WebSocket, response: Response) {
                     this@TrackRobotImpl.webSocket = webSocket
+                    isConnected.onNext(true)
                     emitter.onComplete()
                 }
 
                 override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
                     this@TrackRobotImpl.webSocket = null
+                    isConnected.onNext(false)
                 }
 
                 override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                     emitter.onError(t)
+                    isConnected.onNext(false)
                 }
 
                 override fun onMessage(webSocket: WebSocket, bytes: ByteString) {

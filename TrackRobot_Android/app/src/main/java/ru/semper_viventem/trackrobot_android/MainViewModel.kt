@@ -3,6 +3,7 @@ package ru.semper_viventem.trackrobot_android
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -16,6 +17,16 @@ class MainViewModel(
     private var textIsChanging: Boolean = true
     val uiState = MutableLiveData(UiState())
     val sideEffects = SingleLiveEvent<UiSideEffects>()
+
+    init {
+        trackRobot.observeConnected()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeTillCleared { isConnected ->
+                val message = if (isConnected) "Connected" else "Disconnected"
+                emmitSideEffect(UiSideEffects.ToastMessage(message))
+                updateUiState { copy(isConnected = isConnected, buttonsEnabled = isConnected) }
+            }
+    }
 
     override fun onCleared() {
         disposable.dispose()
@@ -56,18 +67,7 @@ class MainViewModel(
             .doOnSubscribe { showProgress() }
             .doOnError { hideProgress() }
             .doOnComplete { hideProgress() }
-            .subscribeTillCleared(
-                doOnError = {
-                    Timber.e(it)
-                    updateUiState { copy(isConnected = false, buttonsEnabled = false) }
-                    emmitSideEffect(UiSideEffects.ToastMessage("Connection error"))
-
-                },
-                doOnSuccess = {
-                    updateUiState { copy(isConnected = true, buttonsEnabled = true) }
-                    emmitSideEffect(UiSideEffects.ToastMessage("Connected"))
-                }
-            )
+            .subscribeTillCleared()
     }
 
     private fun changeIpAddress(text: String) {
@@ -82,7 +82,7 @@ class MainViewModel(
     }
 
     private fun showProgress() {
-        updateUiState { copy(isLoading = true) }.apply {  }
+        updateUiState { copy(isLoading = true) }.apply { }
     }
 
     private fun hideProgress() {
@@ -100,6 +100,13 @@ class MainViewModel(
     private fun Completable.subscribeTillCleared(
         doOnError: (e: Throwable) -> Unit = Timber::e,
         doOnSuccess: () -> Unit = { },
+    ) {
+        disposable.add(this.subscribe(doOnSuccess, doOnError))
+    }
+
+    private fun <T> Observable<T>.subscribeTillCleared(
+        doOnError: (e: Throwable) -> Unit = Timber::e,
+        doOnSuccess: (T) -> Unit = { },
     ) {
         disposable.add(this.subscribe(doOnSuccess, doOnError))
     }

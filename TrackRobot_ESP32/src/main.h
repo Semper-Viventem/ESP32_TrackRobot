@@ -25,6 +25,7 @@ const char* wifiPassword = "NapoleoN";
 #define MAX_PWM 255
 
 const char* LEFT = "l";
+const char* BOUTH = "b";
 const char* RIGHT = "r";
 
 void checkPWM(int pwm);
