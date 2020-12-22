@@ -15,6 +15,7 @@ const char* wifiPassword = "NapoleoN";
 #define PIN_B_DIR 13
 #define PIN_A_PWM 27
 #define PIN_A_DIR 14
+#define PIN_LED 15
 
 #define PWM_FREQ 500
 #define PWM_RESOLUTION 8
@@ -25,7 +26,7 @@ const char* wifiPassword = "NapoleoN";
 #define MAX_PWM 255
 
 const char* LEFT = "l";
-const char* BOUTH = "b";
+const char* BOTH = "b";
 const char* RIGHT = "r";
 
 void checkPWM(int pwm);
@@ -37,5 +38,6 @@ void initPins();
 void initWiFi();
 void handleMessage(String message);
 void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
+void blink();
 
 #endif

@@ -94,8 +94,11 @@ class TrackRobotImpl : TrackRobot {
                 }
 
                 override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                    emitter.onError(t)
+                    if (!emitter.isDisposed) {
+                        emitter.onError(t)
+                    }
                     isConnected.onNext(false)
+                    this@TrackRobotImpl.webSocket = null
                 }
 
                 override fun onMessage(webSocket: WebSocket, bytes: ByteString) {

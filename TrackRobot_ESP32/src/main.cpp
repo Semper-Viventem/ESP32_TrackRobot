@@ -45,7 +45,7 @@ void handleMessage(String message) {
   checkPWM(value);
 
   String firstSymbol = message.substring(0, 1);
-
+  
   Serial.print(firstSymbol);
   Serial.print(" -> ");
   Serial.println(value);
@@ -54,8 +54,8 @@ void handleMessage(String message) {
     rotateLeft(value, isReverse);
   } else if (firstSymbol == RIGHT) {
     rotateRight(value, isReverse);
-  } else if (firstSymbol == BOUTH) {
-    rotateeft(value, isReverse);
+  } else if (firstSymbol == BOTH) {
+    rotateLeft(value, isReverse);
     rotateRight(value, isReverse);
   }
 }
@@ -78,17 +78,37 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
 
 void setup() {
   Serial.begin(SERIAL_SPEED);
-  
+
   initPins();
+  
+  blink();
+
   initWiFi();
+  
+  blink();
 
-  ws.onEvent(onWsEvent);
-  server.addHandler(&ws);
+  //ws.onEvent(onWsEvent);
+  
+  //blink();
+  //server.addHandler(&ws);
+  
+  //blink();
 
-  server.begin();
+  //server.begin();
+
+  //blink();
+  //blink();
+  //blink();
 }
 
-void loop() { }
+void loop() {}
+
+void blink() {
+  digitalWrite(PIN_LED, HIGH);
+  delay(200);
+  digitalWrite(PIN_LED, LOW);
+  delay(200);
+}
 
 void initPins() {
   Serial.println("Initializing pins...");
@@ -96,6 +116,9 @@ void initPins() {
   pinMode(PIN_A_PWM, OUTPUT);
   digitalWrite(PIN_A_DIR, LOW);
   digitalWrite(PIN_A_PWM, LOW);
+  
+  pinMode(PIN_LED, OUTPUT);
+  digitalWrite(PIN_LED, LOW);
   
   pinMode(PIN_B_DIR, OUTPUT);
   pinMode(PIN_B_PWM, OUTPUT);
